@@ -1,7 +1,7 @@
 /** @format */
 
-import { Client as Appwrite, Databases, Account, Query } from "appwrite";
-import { Server } from "../config/Server";
+import { Client as Appwrite, Databases, Account } from "appwrite";
+import { Server } from "../config/server";
 
 let api = {
   sdk: null,
@@ -25,8 +25,7 @@ let api = {
   },
 
   getAccount: () => {
-    let account = api.provider().account;
-    return account.get();
+    return api.provider().account.get();
   },
 
   createSession: (email, password) => {
@@ -46,19 +45,16 @@ let api = {
   },
 
   updatePreferences: (preferences) => {
-    console.log("API :", preferences);
     return api.provider().account.updatePrefs(preferences);
   },
 
   createDocument: (data) => {
-    return api
-      .provider()
-      .database.createDocument(
-        Server.databaseID,
-        Server.collectionID,
-        "unique()",
-        data
-      );
+    return api.provider().database.createDocument(
+      Server.databaseID,
+      Server.collectionID,
+      "unique()",
+      data
+    );
   },
 
   listDocuments: (databaseId, collectionId) => {
@@ -66,32 +62,24 @@ let api = {
   },
 
   getDocument: (databaseId, collectionId, documentId) => {
-    return api
-      .provider()
-      .database.getDocument(databaseId, collectionId, documentId);
+    return api.provider().database.getDocument(databaseId, collectionId, documentId);
   },
 
   updateDocument: (documentId, data) => {
-    return api
-      .provider()
-      .database.updateDocument(
-        Server.databaseID,
-        Server.collectionID,
-        documentId,
-        data
-      );
+    return api.provider().database.updateDocument(
+      Server.databaseID,
+      Server.collectionID,
+      documentId,
+      data
+    );
   },
 
   deleteDocument: (databaseId, collectionId, documentId) => {
-    return api
-      .provider()
-      .database.deleteDocument(databaseId, collectionId, documentId);
+    return api.provider().database.deleteDocument(databaseId, collectionId, documentId);
   },
 
   uploadImage: async (image) => {
     let filename = image.split("/").pop();
-
-    // Infer the type of the image
     let match = /\.(\w+)$/.exec(image);
     let type = match ? `image/${match[1]}` : `image`;
 
@@ -102,29 +90,25 @@ let api = {
       name: filename,
       type,
     });
-    console.log("FORM DATA :", formData);
-    return fetch(
-      `${Server.endpoint}/storage/buckets/${Server.bucketID}/files/`,
-      {
-        method: "POST",
-        headers: {
-          "content-type": "multipart/form-data",
-          "X-Appwrite-Project": Server.project,
-          "x-sdk-version": "appwrite:web:11.0.0",
-          "X-Appwrite-Response-Format": "0.15.0",
-        },
-        body: formData,
-        credentials: "include",
-      }
-    )
+
+    return fetch(`${Server.endpoint}/storage/buckets/${Server.bucketID}/files/`, {
+      method: "POST",
+      headers: {
+        "content-type": "multipart/form-data",
+        "X-Appwrite-Project": Server.project,
+        "x-sdk-version": "appwrite:web:11.0.0",
+        "X-Appwrite-Response-Format": "0.15.0",
+      },
+      body: formData,
+      credentials: "include",
+    })
       .then((response) => response.json())
       .then((result) => {
         let imageURL = `https://cloud.appwrite.io/v1/storage/buckets/${result.bucketId}/files/${result.$id}/view?project=getamealnow&mode=admin`;
-        console.log("API RESPONSE", JSON.stringify(result));
         return imageURL;
       })
       .catch((error) => {
-        console.log("API ERROR", error);
+        console.error("API ERROR", error);
         return "error";
       });
   },

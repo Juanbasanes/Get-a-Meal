@@ -78,7 +78,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <Layout>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>Bonjour {user?.name} 👋🏻</Text>
+        <Text style={styles.title}>Hi {user?.name} 👋🏻</Text>
         <Avatar gender={gender} />
       </View>
 
